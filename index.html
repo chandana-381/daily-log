@@ -1,119 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chandana's Daily Log</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
-            color: #f8fafc;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 650px;
-            margin: 0 auto;
-        }
-        header {
-            text-align: center;
-            padding: 35px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        h1 {
-            margin: 0;
-            font-size: 2rem;
-            background: linear-gradient(90deg, #38bdf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        header p {
-            color: #94a3b8;
-            margin-top: 8px;
-            font-size: 0.95rem;
-        }
-        .card {
-            background: rgba(30, 41, 59, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 22px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: #38bdf8;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-        }
-        .date {
-            color: #38bdf8;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        .card-body p {
-            margin: 12px 0;
-            line-height: 1.5;
-            color: #e2e8f0;
-        }
-        .progress-label {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            margin-top: 15px;
-            margin-bottom: 6px;
-        }
-        .progress-bg {
-            background: rgba(255, 255, 255, 0.1);
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-bar {
-            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
-            height: 100%;
-            border-radius: 4px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Daily Journal</title>
+<style>
+:root { --bg1:#0f172a; --bg2:#1e1b4b; --card:rgba(30,41,59,0.85); --accent:#38bdf8; --accent2:#c084fc; --text:#f8fafc; --muted:#94a3b8; }
+* { box-sizing:border-box; }
+body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; margin:0; padding:16px; min-height:100vh; }
+.container { max-width:750px; margin:0 auto; }
+header { text-align:center; padding:25px 20px; background:rgba(255,255,255,0.05); border-radius:20px; border:1px solid rgba(255,255,255,0.1); margin-bottom:24px; }
+h1 { margin:0; font-size:1.8rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.subtitle { color:var(--muted); font-size:0.9rem; margin-top:6px; }
+.stats-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:18px; }
+.stat-box { background:rgba(15,23,42,0.6); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
+.stat-num { font-size:1.3rem; font-weight:bold; color:var(--accent); }
+.stat-label { font-size:0.75rem; color:var(--muted); }
+.editor-panel, .card { background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:18px; margin-bottom:20px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+@media (max-width:520px) { .form-grid { grid-template-columns:1fr; } }
+label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:5px; }
+input, select, textarea { width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.15); color:var(--text); padding:10px; border-radius:10px; font-size:0.95rem; font-family:inherit; }
+textarea { min-height:110px; resize:vertical; }
+.full-width { margin-bottom:12px; }
+.btn-row, .toolbar, .card-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+button { cursor:pointer; border:none; padding:10px 16px; border-radius:10px; font-weight:600; font-size:0.9rem; }
+.btn-primary { background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#0f172a; flex:1; }
+.btn-secondary { background:rgba(255,255,255,0.1); color:var(--text); }
+.toolbar { margin-bottom:20px; }
+.toolbar input { flex:2; min-width:180px; }
+.toolbar select { flex:1; min-width:130px; }
+.card-top { display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; margin-bottom:10px; }
+.card-title { margin:0; font-size:1.15rem; }
+.meta-line { font-size:0.8rem; color:var(--muted); margin-top:4px; }
+.badge { display:inline-block; background:rgba(56,189,248,0.15); color:var(--accent); padding:2px 8px; border-radius:12px; font-size:0.75rem; margin-left:4px; }
+.journal-text { white-space:pre-wrap; line-height:1.5; margin:12px 0; color:#e2e8f0; }
+.highlights { background:rgba(15,23,42,0.5); padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:10px; }
+.progress-bg { background:rgba(255,255,255,0.1); height:6px; border-radius:4px; overflow:hidden; margin-top:6px; }
+.progress-bar { background:linear-gradient(90deg,var(--accent),var(--accent2)); height:100%; }
+.btn-edit { background:rgba(56,189,248,0.2); color:var(--accent); padding:6px 12px; font-size:0.8rem; }
+.btn-delete { background:rgba(244,63,94,0.2); color:#fb7185; padding:6px 12px; font-size:0.8rem; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🚀 Chandana's Daily Log</h1>
-            <p>Automated Developer Journal • Built from Android</p>
-        </header>
-        <div id="entries">
-        
-        <!-- NEW_ENTRY -->
-        <div class="card">
-            <div class="card-header">
-                <span class="date">📅 October 14, 2026 • 06:53 PM</span>
-                <span class="stars">⭐⭐</span>
+<div class="container">
+    <header>
+        <h1>✨ Chandana's Daily Journal Hub</h1>
+        <div class="subtitle">Write in your own words • Edit anytime • Track growth</div>
+        <div class="stats-bar">
+            <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Logs</div></div>
+            <div class="stat-box"><div class="stat-num" id="statAvg">0.0 ⭐</div><div class="stat-label">Avg Rating</div></div>
+            <div class="stat-box"><div class="stat-num" id="statTopMood">🔥</div><div class="stat-label">Latest Mood</div></div>
+        </div>
+    </header>
+
+    <div class="editor-panel">
+        <h3 id="formHeading" style="margin-top:0; color:var(--accent);">✍️ Write Today's Journal</h3>
+        <input type="hidden" id="editId" value="">
+        <div class="form-grid">
+            <div>
+                <label>Entry Title</label>
+                <input type="text" id="titleInput" placeholder="e.g., Built my interactive website!">
             </div>
-            <div class="card-body">
-                <p><strong>🎯 Primary Focus:</strong> work</p>
-                <p><strong>✅ Completed:</strong> this project</p>
-                <p><strong>💡 Learned:</strong> nothing</p>
-            </div>
-            <div class="progress-label">Day Energy / Rating (40%)</div>
-            <div class="progress-bg">
-                <div class="progress-bar" style="width: 40%;"></div>
+            <div>
+                <label>Category / Tag</label>
+                <select id="categoryInput">
+                    <option value="💻 Coding & Tech">💻 Coding & Tech</option>
+                    <option value="📚 Study & College">📚 Study & College</option>
+                    <option value="🌱 Personal Thoughts">🌱 Personal Thoughts</option>
+                    <option value="🎯 Goals & Wins">🎯 Goals & Wins</option>
+                    <option value="💡 Ideas & Notes">💡 Ideas & Notes</option>
+                </select>
             </div>
         </div>
+        <div class="form-grid">
+            <div>
+                <label>Today's Mood</label>
+                <select id="moodInput">
+                    <option value="🔥 Motivated">🔥 Motivated</option>
+                    <option value="😊 Happy">😊 Happy</option>
+                    <option value="🧠 Focused">🧠 Focused</option>
+                    <option value="😌 Peaceful">😌 Peaceful</option>
+                    <option value="😴 Tired">😴 Tired</option>
+                    <option value="⚡ Productive">⚡ Productive</option>
+                </select>
+            </div>
+            <div>
+                <label>Day Rating: <span id="ratingVal">5</span> / 5 ⭐</label>
+                <input type="range" id="ratingInput" min="1" max="5" value="5" oninput="document.getElementById('ratingVal').innerText=this.value">
+            </div>
+        </div>
+        <div class="full-width">
+            <label>Write Your Journal (In Your Own Words)</label>
+            <textarea id="contentInput" placeholder="Write freely about your day, thoughts, achievements, or lessons..."></textarea>
+        </div>
+        <div class="full-width">
+            <label>Key Highlight / Tomorrow's Goal (Optional)</label>
+            <input type="text" id="goalInput" placeholder="e.g., Practice Python tomorrow">
+        </div>
+        <div class="btn-row">
+            <button class="btn-primary" id="saveBtn" onclick="saveEntry()">💾 Save Journal Entry</button>
+            <button class="btn-secondary" id="cancelBtn" onclick="resetForm()" style="display:none;">Cancel</button>
+            <button class="btn-secondary" onclick="exportMarkdown()">📥 Backup .md</button>
         </div>
     </div>
+
+    <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="🔍 Search entries..." oninput="renderEntries()">
+        <select id="filterCategory" onchange="renderEntries()">
+            <option value="ALL">All Categories</option>
+            <option value="💻 Coding & Tech">💻 Coding & Tech</option>
+            <option value="📚 Study & College">📚 Study & College</option>
+            <option value="🌱 Personal Thoughts">🌱 Personal Thoughts</option>
+            <option value="🎯 Goals & Wins">🎯 Goals & Wins</option>
+            <option value="💡 Ideas & Notes">💡 Ideas & Notes</option>
+        </select>
+    </div>
+    <div id="entriesList"></div>
+</div>
+<script>
+const STORAGE_KEY = "chandana_daily_logs_v2";
+
+function getLogs() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+        const starter = [{
+            id: Date.now(),
+            date: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
+            time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+            title: "Launched My Interactive Daily Log Website!",
+            category: "💻 Coding & Tech",
+            mood: "🔥 Motivated",
+            rating: 5,
+            content: "Today I upgraded my project into a full interactive web app directly from my phone using Termux and GitHub Pages. Now I can write freely in my own words and edit any entry anytime!",
+            goal: "Log my progress every single day."
+        }];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(starter));
+        return starter;
+    }
+    return JSON.parse(raw);
+}
+
+function saveEntry() {
+    const title = document.getElementById("titleInput").value.trim();
+    const content = document.getElementById("contentInput").value.trim();
+    const category = document.getElementById("categoryInput").value;
+    const mood = document.getElementById("moodInput").value;
+    const rating = parseInt(document.getElementById("ratingInput").value);
+    const goal = document.getElementById("goalInput").value.trim();
+    const editId = document.getElementById("editId").value;
+
+    if (!title || !content) { alert("Please enter both a Title and your Journal thoughts!"); return; }
+    let logs = getLogs();
+
+    if (editId) {
+        logs = logs.map(item => String(item.id) === String(editId) ? { ...item, title, content, category, mood, rating, goal, edited:true } : item);
+    } else {
+        const now = new Date();
+        logs.unshift({
+            id: Date.now(),
+            date: now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
+            time: now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+            title, category, mood, rating, content, goal
+        });
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    resetForm();
+    renderEntries();
+}
+
+function editEntry(id) {
+    const item = getLogs().find(e => String(e.id) === String(id));
+    if (!item) return;
+    document.getElementById("editId").value = item.id;
+    document.getElementById("titleInput").value = item.title;
+    document.getElementById("categoryInput").value = item.category;
+    document.getElementById("moodInput").value = item.mood;
+    document.getElementById("ratingInput").value = item.rating;
+    document.getElementById("ratingVal").innerText = item.rating;
+    document.getElementById("contentInput").value = item.content;
+    document.getElementById("goalInput").value = item.goal || "";
+    document.getElementById("formHeading").innerText = "✏️ Editing Journal Entry";
+    document.getElementById("saveBtn").innerText = "✅ Update Entry";
+    document.getElementById("cancelBtn").style.display = "inline-block";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteEntry(id) {
+    if (!confirm("Delete this journal entry?")) return;
+    const logs = getLogs().filter(e => String(e.id) !== String(id));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    renderEntries();
+}
+function resetForm() {
+    document.getElementById("editId").value = "";
+    document.getElementById("titleInput").value = "";
+    document.getElementById("contentInput").value = "";
+    document.getElementById("goalInput").value = "";
+    document.getElementById("ratingInput").value = 5;
+    document.getElementById("ratingVal").innerText = "5";
+    document.getElementById("formHeading").innerText = "✍️ Write Today's Journal";
+    document.getElementById("saveBtn").innerText = "💾 Save Journal Entry";
+    document.getElementById("cancelBtn").style.display = "none";
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]));
+}
+
+function renderEntries() {
+    const logs = getLogs();
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const filterCat = document.getElementById("filterCategory").value;
+    const container = document.getElementById("entriesList");
+
+    document.getElementById("statTotal").innerText = logs.length;
+    const avg = logs.length ? (logs.reduce((s, e) => s + Number(e.rating), 0) / logs.length).toFixed(1) : "0.0";
+    document.getElementById("statAvg").innerText = avg + " ⭐";
+    document.getElementById("statTopMood").innerText = logs.length ? logs[0].mood.split(" ")[0] : "✨";
+
+    const filtered = logs.filter(item => {
+        const mSearch = item.title.toLowerCase().includes(search) || item.content.toLowerCase().includes(search);
+        const mCat = filterCat === "ALL" || item.category === filterCat;
+        return mSearch && mCat;
+    });
+
+    if (!filtered.length) {
+        container.innerHTML = `<div class="card" style="text-align:center;color:var(--muted);">No entries found. Write above!</div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map(item => {
+        const stars = "⭐".repeat(item.rating);
+        const pct = item.rating * 20;
+        return `<div class="card">
+            <div class="card-top">
+                <div>
+                    <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                    <div class="meta-line">📅 ${item.date} • ${item.time} ${item.edited ? '<em>(edited)</em>' : ''}
+                        <span class="badge">${item.category}</span><span class="badge">${item.mood}</span>
+                    </div>
+                </div>
+                <div>${stars}</div>
+            </div>
+            <div class="journal-text">${escapeHtml(item.content)}</div>
+            ${item.goal ? `<div class="highlights">🎯 <strong>Goal/Highlight:</strong> ${escapeHtml(item.goal)}</div>` : ''}
+            <div style="font-size:0.75rem;color:#94a3b8;">Day Energy (${pct}%)</div>
+            <div class="progress-bg"><div class="progress-bar" style="width:${pct}%"></div></div>
+            <div class="card-actions" style="justify-content:flex-end;">
+                <button class="btn-edit" onclick="editEntry('${item.id}')">✏️ Edit</button>
+                <button class="btn-delete" onclick="deleteEntry('${item.id}')">🗑️ Delete</button>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+function exportMarkdown() {
+    let md = "# Daily Journal Backup\n\n";
+    getLogs().forEach(i => {
+        md += `## ${i.title} (${i.date} - ${i.time})\n* **Category:** ${i.category} | **Mood:** ${i.mood} | **Rating:** ${i.rating}/5\n\n${i.content}\n\n---\n\n`;
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([md], { type:"text/markdown" }));
+    a.download = "JOURNAL_BACKUP.md";
+    a.click();
+}
+
+renderEntries();
+</script>
 </body>
 </html>
