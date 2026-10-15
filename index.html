@@ -9,6 +9,20 @@
 * { box-sizing:border-box; }
 body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; margin:0; padding:16px; min-height:100vh; }
 .container { max-width:750px; margin:0 auto; }
+    <!-- LOCK SCREEN OVERLAY -->
+    <div id="lockScreen" class="fixed inset-0 bg-darker z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-cardDark border border-borderDark p-6 rounded-xl max-w-sm w-full shadow-2xl text-center">
+            <h2 class="text-xl font-bold mb-2">🔒 Enter Journal PIN</h2>
+            <p id="lockSubtitle" class="text-sm text-gray-400 mb-4">Please enter your PIN to unlock your entries.</p>
+            <form id="pinForm" onsubmit="handlePinSubmit(event)">
+                <input type="password" id="pinInput" maxlength="6" placeholder="Enter PIN" 
+                    class="w-full bg-darker border border-borderDark rounded-lg px-4 py-3 text-center text-xl tracking-widest text-white mb-4 focus:outline-none focus:border-indigo-500" required>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition">Unlock</button>
+            </form>
+            <p id="pinError" class="text-red-400 text-xs mt-3 hidden">Incorrect PIN. Please try again.</p>
+        </div>
+    </div>
+
 header { text-align:center; padding:25px 20px; background:rgba(255,255,255,0.05); border-radius:20px; border:1px solid rgba(255,255,255,0.1); margin-bottom:24px; }
 h1 { margin:0; font-size:1.8rem; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .subtitle { color:var(--muted); font-size:0.9rem; margin-top:6px; }
@@ -267,6 +281,74 @@ function exportMarkdown() {
 }
 
 renderEntries();
+        // PIN Lock Screen Logic
+        const STORAGE_PIN_KEY = 'daily_log_pin';
+        const lockScreen = document.getElementById('lockScreen');
+        const pinForm = document.getElementById('pinForm');
+        const pinInput = document.getElementById('pinInput');
+        const pinError = document.getElementById('pinError');
+        const lockSubtitle = document.getElementById('lockSubtitle');
+
+        let isSettingNewPin = false;
+
+        function initLockScreen() {
+            const savedPin = localStorage.getItem(STORAGE_PIN_KEY);
+            if (!savedPin) {
+                isSettingNewPin = true;
+                lockSubtitle.textContent = "Create a 4-6 digit PIN to secure your journal.";
+                lockScreen.classList.remove('hidden');
+            } else {
+                lockScreen.classList.remove('hidden');
+            }
+        }
+
+        function handlePinSubmit(e) {
+            e.preventDefault();
+            const enteredPin = pinInput.value;
+            const savedPin = localStorage.getItem(STORAGE_PIN_KEY);
+
+            if (isSettingNewPin) {
+                if (enteredPin.length < 4) {
+                    pinError.textContent = "PIN must be at least 4 digits.";
+                    pinError.classList.remove('hidden');
+                    return;
+                }
+                localStorage.setItem(STORAGE_PIN_KEY, enteredPin);
+                lockScreen.classList.add('hidden');
+                pinInput.value = '';
+                pinError.classList.add('hidden');
+                isSettingNewPin = false;
+            } else {
+                if (enteredPin === savedPin) {
+                    lockScreen.classList.add('hidden');
+                    pinInput.value = '';
+                    pinError.classList.add('hidden');
+                } else {
+                    pinError.textContent = "Incorrect PIN. Please try again.";
+                    pinError.classList.remove('hidden');
+                    pinInput.value = '';
+                }
+            }
+        }
+
+        function openPinSettings() {
+            const currentPin = prompt("Enter your current PIN to change it:");
+            if (currentPin === localStorage.getItem(STORAGE_PIN_KEY)) {
+                const newPin = prompt("Enter your new PIN (4-6 digits):");
+                if (newPin && newPin.length >= 4) {
+                    localStorage.setItem(STORAGE_PIN_KEY, newPin);
+                    alert("PIN successfully updated!");
+                } else {
+                    alert("Invalid PIN length.");
+                }
+            } else if (currentPin !== null) {
+                alert("Incorrect current PIN.");
+            }
+        }
+
+        // Run lock screen check on page load
+        window.addEventListener('DOMContentLoaded', initLockScreen);
+
 </script>
 </body>
 </html>
